@@ -228,9 +228,22 @@ class App(tk.Tk):
     def refresh_picker(self):
         self.picker_list.delete(0, "end")
         query = self.gen_search.get().strip().lower()
-        for code, phrase in self.phrases.items():
-            display = f"{code} - {phrase}" if isinstance(phrase, str) else f"{code} (groupe)"
-            if query and query not in code.lower() and query not in display.lower():
+        # Groups first
+        self.picker_list.insert("end", "── GROUPES ──")
+        for code, val in self.phrases.items():
+            if not isinstance(val, list):
+                continue
+            display = f"{code} - {', '.join(val)}"
+            if query and query not in display.lower():
+                continue
+            self.picker_list.insert("end", display)
+        # Then individual phrases
+        self.picker_list.insert("end", "── PHRASES ──")
+        for code, val in self.phrases.items():
+            if not isinstance(val, str):
+                continue
+            display = f"{code} - {val}"
+            if query and query not in display.lower():
                 continue
             self.picker_list.insert("end", display)
 
@@ -238,7 +251,10 @@ class App(tk.Tk):
         sel = self.picker_list.curselection()
         if not sel:
             return
-        code = self.picker_list.get(sel[0]).split(" - ")[0].split(" (")[0].strip()
+        text = self.picker_list.get(sel[0])
+        if text.startswith("──"):
+            return
+        code = text.split(" - ")[0].strip()
         current = self.gen_input.get().strip()
         if current:
             self.gen_input.insert("end", f"-{code}")
