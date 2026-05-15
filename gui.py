@@ -60,14 +60,24 @@ class App(tk.Tk):
 
     # --- TAB 1: VIEW ---
     def build_view_tab(self):
+        search_frame = ttk.Frame(self.tab_view)
+        search_frame.pack(fill="x", padx=10, pady=5)
+        ttk.Label(search_frame, text="🔍 Rechercher :").pack(side="left")
+        self.view_search = ttk.Entry(search_frame, width=40)
+        self.view_search.pack(side="left", padx=5)
+        self.view_search.bind("<KeyRelease>", lambda e: self.refresh_view())
+
+        tree_frame = ttk.Frame(self.tab_view)
+        tree_frame.pack(fill="both", expand=True)
+
         cols = ("Code", "Phrase")
-        self.view_tree = ttk.Treeview(self.tab_view, columns=cols, show="headings")
+        self.view_tree = ttk.Treeview(tree_frame, columns=cols, show="headings")
         self.view_tree.heading("Code", text="Code")
         self.view_tree.heading("Phrase", text="Phrase")
         self.view_tree.column("Code", width=80, minwidth=60)
         self.view_tree.column("Phrase", width=750)
 
-        scrollbar = ttk.Scrollbar(self.tab_view, orient="vertical", command=self.view_tree.yview)
+        scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=self.view_tree.yview)
         self.view_tree.configure(yscrollcommand=scrollbar.set)
 
         self.view_tree.pack(side="left", fill="both", expand=True)
@@ -76,8 +86,12 @@ class App(tk.Tk):
 
     def refresh_view(self):
         self.view_tree.delete(*self.view_tree.get_children())
+        query = self.view_search.get().strip().lower() if hasattr(self, 'view_search') else ""
         for code, phrase in self.phrases.items():
-            self.view_tree.insert("", "end", values=(code, phrase))
+            display = str(phrase)
+            if query and query not in code.lower() and query not in display.lower():
+                continue
+            self.view_tree.insert("", "end", values=(code, display))
 
     # --- TAB 2: EDIT ---
     def build_edit_tab(self):
@@ -169,9 +183,12 @@ class App(tk.Tk):
 
         ttk.Button(top, text="Copier", command=self.copy_output).pack(side="left")
         ttk.Button(top, text="Sauvegarder", command=self.save_output).pack(side="left", padx=5)
+        ttk.Button(top, text="Effacer", command=self.clear_gen).pack(side="left", padx=5)
 
         self.preview = tk.Text(self.tab_gen, wrap="word", state="disabled", height=20)
         self.preview.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+
+        self.bind("<Control-c>", lambda e: self.copy_output())
 
     def get_output(self):
         codes = self.gen_input.get().strip().split("-")
@@ -191,7 +208,11 @@ class App(tk.Tk):
         self.preview.insert("1.0", output)
         self.preview.config(state="disabled")
 
-    def copy_output(self):
+    def clear_gen(self):
+        self.gen_input.delete(0, "end")
+        self.update_preview()
+
+    def copy_output(self, event=None):
         output = self.get_output()
         if not output:
             return
