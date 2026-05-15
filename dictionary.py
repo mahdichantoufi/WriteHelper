@@ -192,4 +192,10 @@ PHRASES = {
     "ML5": "Certificat remis aux autorités requérantes",
     "ML6": "Fait à",
     "ML7": "Le",
+
+    # --- GROUPES (PARAGRAPHES) ---
+    # Un groupe est une liste de codes qui seront déroulés successivement
+    "INTRO": ["ID6", "ID7", "EG1", "EG2"],
+    "CONCL": ["ML1", "C1", "C5"],
+    "STRANG": ["F6", "TC7", "TC8", "TC9"],
 }

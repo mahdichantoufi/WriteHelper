@@ -15,6 +15,18 @@ def load_phrases():
         exec(f.read(), ns)
     return ns.get("PHRASES", {})
 
+def resolve_code(phrases, code):
+    """Resolve a code: if it's a group (list), expand recursively. Otherwise return the phrase."""
+    val = phrases.get(code)
+    if val is None:
+        return [f"[Code inconnu: {code}]"]
+    if isinstance(val, list):
+        lines = []
+        for sub in val:
+            lines.extend(resolve_code(phrases, sub.strip().upper()))
+        return lines
+    return [val]
+
 def save_phrases(phrases):
     """Write PHRASES dict back to dictionary.py"""
     with open(DICT_PATH, "w", encoding="utf-8") as f:
@@ -156,6 +168,7 @@ class App(tk.Tk):
         self.gen_input.bind("<KeyRelease>", self.update_preview)
 
         ttk.Button(top, text="Copier", command=self.copy_output).pack(side="left")
+        ttk.Button(top, text="Sauvegarder", command=self.save_output).pack(side="left", padx=5)
 
         self.preview = tk.Text(self.tab_gen, wrap="word", state="disabled", height=20)
         self.preview.pack(fill="both", expand=True, padx=10, pady=(0, 10))
@@ -167,10 +180,8 @@ class App(tk.Tk):
             code = code.strip().upper()
             if not code:
                 continue
-            if code in self.phrases:
-                lines.append(f"• {self.phrases[code]}")
-            else:
-                lines.append(f"• [Code inconnu: {code}]")
+            for phrase in resolve_code(self.phrases, code):
+                lines.append(f"• {phrase}")
         return "\n".join(lines)
 
     def update_preview(self, event=None):
@@ -185,10 +196,16 @@ class App(tk.Tk):
         if not output:
             return
         pyperclip.copy(output)
+        messagebox.showinfo("WriteHelper", "Copié dans le presse-papier !")
+
+    def save_output(self):
+        output = self.get_output()
+        if not output:
+            return
         filename = os.path.join(SCRIPT_DIR, datetime.now().strftime("%Y%m%d_%H%M%S") + ".txt")
         with open(filename, "w", encoding="utf-8") as f:
             f.write(output)
-        messagebox.showinfo("WriteHelper", f"Copié dans le presse-papier !\nSauvegardé: {os.path.basename(filename)}")
+        messagebox.showinfo("WriteHelper", f"Sauvegardé: {os.path.basename(filename)}")
 
 if __name__ == "__main__":
     App().mainloop()

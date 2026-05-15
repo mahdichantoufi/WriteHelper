@@ -1,21 +1,26 @@
 # WriteHelper - Outil de rédaction médico-légale
 
-## Utilisation
+## Prérequis
 
-1. Double-cliquer sur `writehelper.py`
-2. Entrer les codes séparés par des tirets (ex: `ID6-ID7-F1-TC4-ITT3-C1`)
-3. Le texte est copié dans le presse-papier et sauvegardé dans un fichier horodaté
+- Python 3.x → https://www.python.org/downloads/ (cocher "Add to PATH")
+- `pip install pyperclip`
 
-## Modifier le dictionnaire
+Ou lancer `installer.bat`.
 
-[📝 Ouvrir le dictionnaire dans le Bloc-notes](dictionary.py)
+## Fichiers
 
-Ou directement via l'Explorateur Windows : clic droit sur `dictionary.py` → Ouvrir avec → Bloc-notes
+| Fichier | Rôle |
+|---------|------|
+| `gui.py` | Interface graphique (point d'entrée) |
+| `dictionary.py` | Dictionnaire des codes et phrases |
+| `Modifier le dictionnaire.bat` | Ouvre le dictionnaire dans Bloc-notes |
+| `installer.bat` | Installe les dépendances |
+| `NOTICE_UTILISATEUR.md` | Guide pas-à-pas pour les utilisateurs |
 
-Format des entrées :
-```
-"CODE": "Phrase associée",
-```
+## Architecture
+
+- `dictionary.py` expose un dict `PHRASES` : clé = code, valeur = phrase (str) ou groupe (list de codes)
+- `gui.py` : 3 onglets tkinter (consultation, édition, génération avec prévisualisation)
 
 ## Codes disponibles
 
@@ -37,8 +42,9 @@ Format des entrées :
 | ENF | Enfants / mineurs |
 | ML | Formules médico-légales |
 
-## Prérequis
+## Groupes
 
-```
-pip install pyperclip
+Un code peut référencer une liste de sous-codes (paragraphe) :
+```python
+"INTRO": ["ID6", "ID7", "EG1", "EG2"],
 ```
