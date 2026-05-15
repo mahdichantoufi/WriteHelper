@@ -39,9 +39,21 @@ def save_phrases(phrases):
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("WriteHelper - Médecine Légale")
+        self.title("WriteHelper - M\u00e9decine L\u00e9gale")
         self.geometry("900x600")
+        self.configure(bg="#f0f4f8")
         self.phrases = load_phrases()
+
+        style = ttk.Style(self)
+        style.theme_use("clam")
+        style.configure("TNotebook", background="#f0f4f8")
+        style.configure("TNotebook.Tab", padding=[12, 6], font=("Segoe UI", 10, "bold"))
+        style.map("TNotebook.Tab", background=[("selected", "#4a90d9"), ("!selected", "#d0dce8")], foreground=[("selected", "white"), ("!selected", "#333")])
+        style.configure("TFrame", background="#f0f4f8")
+        style.configure("TLabel", background="#f0f4f8", font=("Segoe UI", 10))
+        style.configure("TButton", font=("Segoe UI", 9, "bold"), padding=5)
+        style.configure("Treeview", font=("Segoe UI", 9), rowheight=25)
+        style.configure("Treeview.Heading", font=("Segoe UI", 10, "bold"), background="#4a90d9", foreground="white")
 
         notebook = ttk.Notebook(self)
         notebook.pack(fill="both", expand=True, padx=5, pady=5)
@@ -50,9 +62,9 @@ class App(tk.Tk):
         self.tab_edit = ttk.Frame(notebook)
         self.tab_gen = ttk.Frame(notebook)
 
-        notebook.add(self.tab_view, text="📋 Dictionnaire")
-        notebook.add(self.tab_edit, text="✏️ Éditeur")
-        notebook.add(self.tab_gen, text="⚡ Générateur")
+        notebook.add(self.tab_view, text="\U0001f4cb Dictionnaire")
+        notebook.add(self.tab_edit, text="\u270f\ufe0f \u00c9diteur")
+        notebook.add(self.tab_gen, text="\u26a1 G\u00e9n\u00e9rateur")
 
         self.build_view_tab()
         self.build_edit_tab()

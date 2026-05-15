@@ -14,7 +14,7 @@ C'est prêt !
 
 ## Lancer l'outil
 
-Double-cliquer sur **`gui.py`**
+Double-cliquer sur **`gui.pyw`**
 
 Une fenêtre s'ouvre avec 3 onglets en haut :
 

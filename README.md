@@ -13,7 +13,7 @@
 
 | Fichier | Rôle |
 |---------|------|
-| `gui.py` | Interface graphique (point d'entrée) |
+| `gui.pyw` | Interface graphique (point d'entrée, sans console) |
 | `dictionary.py` | Dictionnaire des codes et phrases |
 | `installer.bat` | Installe les dépendances |
 | `NOTICE_UTILISATEUR.md` | Guide pas-à-pas pour les utilisateurs |
