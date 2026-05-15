@@ -161,6 +161,7 @@ PHRASES = {
     "ML5": "Certificat remis aux autorités requérantes",
     "ML6": "Fait à",
     "ML7": "Le",
+    "ID8": "Je soussigné(e), Docteur CHANTOUFI",
 }
 
 # --- GROUPES (PARAGRAPHES) ---

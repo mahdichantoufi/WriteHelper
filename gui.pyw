@@ -11,7 +11,9 @@ def load_data():
     ns = {}
     with open(DICT_PATH, "r", encoding="utf-8") as f:
         exec(f.read(), ns)
-    return ns.get("PHRASES", {}), ns.get("GROUPS", {})
+    phrases = dict(sorted(ns.get("PHRASES", {}).items()))
+    groups = dict(sorted(ns.get("GROUPS", {}).items()))
+    return phrases, groups
 
 def save_data(phrases, groups):
     with open(DICT_PATH, "w", encoding="utf-8") as f:
@@ -73,6 +75,14 @@ class App(tk.Tk):
         self.build_edit_tab()
         self.build_groups_tab()
         self.build_gen_tab()
+
+    def reload(self):
+        self.phrases, self.groups = load_data()
+        self.refresh_view()
+        self.refresh_edit()
+        self.refresh_grp_list()
+        self.refresh_grp_available()
+        self.refresh_picker()
 
     # --- TAB 1: VIEW ---
     def build_view_tab(self):
@@ -168,9 +178,7 @@ class App(tk.Tk):
                 return
         self.phrases[code] = phrase
         save_data(self.phrases, self.groups)
-        self.refresh_edit()
-        self.refresh_view()
-        self.refresh_picker()
+        self.reload()
 
     def delete_entry(self):
         code = self.edit_code.get().strip().upper()
@@ -181,9 +189,7 @@ class App(tk.Tk):
             return
         del self.phrases[code]
         save_data(self.phrases, self.groups)
-        self.refresh_edit()
-        self.refresh_view()
-        self.refresh_picker()
+        self.reload()
         self.edit_code.delete(0, "end")
         self.edit_phrase.delete(0, "end")
 
@@ -313,8 +319,7 @@ class App(tk.Tk):
                 return
         self.groups[name] = codes
         save_data(self.phrases, self.groups)
-        self.refresh_grp_list()
-        self.refresh_picker()
+        self.reload()
 
     def delete_group(self):
         name = self.grp_name.get().strip().upper()
@@ -325,8 +330,7 @@ class App(tk.Tk):
             return
         del self.groups[name]
         save_data(self.phrases, self.groups)
-        self.refresh_grp_list()
-        self.refresh_picker()
+        self.reload()
         self.grp_name.delete(0, "end")
         self.grp_content.delete(0, "end")
 
