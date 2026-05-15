@@ -9,7 +9,7 @@ Ou lancer `installer.bat`.
 
 ## Notice utilisateur
 
-[Guide pas-à-pas pour les utilisateurs](https://github.com/mahdichantoufi/WriteHelper/blob/master/NOTICE_UTILISATEUR.md)
+[Guide pas-à-pas pour les utilisateurs](./NOTICE_UTILISATEUR.md)
 
 ## Fichiers
 
