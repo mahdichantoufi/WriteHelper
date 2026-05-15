@@ -70,7 +70,7 @@ Une fenêtre s'ouvre avec 3 onglets en haut :
 
 Un groupe permet de regrouper plusieurs codes sous un seul nom.
 
-Pour créer un groupe, ouvrir le fichier `dictionary.py` avec le Bloc-notes (double-cliquer sur `Modifier le dictionnaire.bat`) et ajouter une ligne comme :
+Pour créer un groupe, ouvrir le fichier `dictionary.py` avec le Bloc-notes et ajouter une ligne comme :
 
 ```
 "INTRO": ["ID6", "ID7", "EG1", "EG2"],

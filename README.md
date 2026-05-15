@@ -7,13 +7,16 @@
 
 Ou lancer `installer.bat`.
 
+## Notice utilisateur
+
+[Guide pas-à-pas pour les utilisateurs](https://github.com/mahdichantoufi/WriteHelper/blob/master/NOTICE_UTILISATEUR.md)
+
 ## Fichiers
 
 | Fichier | Rôle |
 |---------|------|
 | `gui.py` | Interface graphique (point d'entrée) |
 | `dictionary.py` | Dictionnaire des codes et phrases |
-| `Modifier le dictionnaire.bat` | Ouvre le dictionnaire dans Bloc-notes |
 | `installer.bat` | Installe les dépendances |
 | `NOTICE_UTILISATEUR.md` | Guide pas-à-pas pour les utilisateurs |
 
