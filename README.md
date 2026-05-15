@@ -1,5 +1,7 @@
 # WriteHelper - Outil de rédaction médico-légale
 
+[⬇️ Télécharger la dernière version](https://github.com/mahdichantoufi/WriteHelper/releases/latest)
+
 ## Prérequis
 
 - Python 3.x → https://www.python.org/downloads/ (cocher "Add to PATH")
