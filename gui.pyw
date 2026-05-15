@@ -197,10 +197,53 @@ class App(tk.Tk):
         ttk.Button(top, text="Sauvegarder", command=self.save_output).pack(side="left", padx=5)
         ttk.Button(top, text="Effacer", command=self.clear_gen).pack(side="left", padx=5)
 
-        self.preview = tk.Text(self.tab_gen, wrap="word", state="disabled", height=20)
-        self.preview.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        # Code picker + preview side by side
+        body = ttk.Frame(self.tab_gen)
+        body.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+
+        # Left: code list to click
+        picker_frame = ttk.Frame(body)
+        picker_frame.pack(side="left", fill="y", padx=(0, 5))
+
+        ttk.Label(picker_frame, text="Cliquer pour ajouter :").pack(anchor="w")
+        self.gen_search = ttk.Entry(picker_frame, width=20)
+        self.gen_search.pack(fill="x", pady=2)
+        self.gen_search.bind("<KeyRelease>", lambda e: self.refresh_picker())
+
+        picker_scroll = ttk.Scrollbar(picker_frame, orient="vertical")
+        self.picker_list = tk.Listbox(picker_frame, width=25, font=("Segoe UI", 9), yscrollcommand=picker_scroll.set)
+        picker_scroll.config(command=self.picker_list.yview)
+        self.picker_list.pack(side="left", fill="both", expand=True)
+        picker_scroll.pack(side="right", fill="y")
+        self.picker_list.bind("<Double-1>", self.on_picker_click)
+        self.refresh_picker()
+
+        # Right: preview
+        self.preview = tk.Text(body, wrap="word", state="disabled", height=20)
+        self.preview.pack(side="left", fill="both", expand=True)
 
         self.bind("<Control-c>", lambda e: self.copy_output())
+
+    def refresh_picker(self):
+        self.picker_list.delete(0, "end")
+        query = self.gen_search.get().strip().lower()
+        for code, phrase in self.phrases.items():
+            display = f"{code} - {phrase}" if isinstance(phrase, str) else f"{code} (groupe)"
+            if query and query not in code.lower() and query not in display.lower():
+                continue
+            self.picker_list.insert("end", display)
+
+    def on_picker_click(self, event):
+        sel = self.picker_list.curselection()
+        if not sel:
+            return
+        code = self.picker_list.get(sel[0]).split(" - ")[0].split(" (")[0].strip()
+        current = self.gen_input.get().strip()
+        if current:
+            self.gen_input.insert("end", f"-{code}")
+        else:
+            self.gen_input.insert(0, code)
+        self.update_preview()
 
     def get_output(self):
         codes = self.gen_input.get().strip().split("-")
@@ -235,7 +278,14 @@ class App(tk.Tk):
         output = self.get_output()
         if not output:
             return
-        filename = os.path.join(SCRIPT_DIR, datetime.now().strftime("%Y%m%d_%H%M%S") + ".txt")
+        from tkinter import filedialog
+        filename = filedialog.asksaveasfilename(
+            defaultextension=".txt",
+            filetypes=[("Fichier texte", "*.txt")],
+            initialfile=datetime.now().strftime("%Y%m%d_%H%M%S") + ".txt"
+        )
+        if not filename:
+            return
         with open(filename, "w", encoding="utf-8") as f:
             f.write(output)
         messagebox.showinfo("WriteHelper", f"Sauvegardé: {os.path.basename(filename)}")
