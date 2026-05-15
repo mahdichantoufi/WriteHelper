@@ -198,12 +198,12 @@ class App(tk.Tk):
         ttk.Button(top, text="Effacer", command=self.clear_gen).pack(side="left", padx=5)
 
         # Code picker + preview side by side
-        body = ttk.Frame(self.tab_gen)
+        body = ttk.PanedWindow(self.tab_gen, orient="horizontal")
         body.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
-        # Left: code list to click
+        # Left: code list to click (25%)
         picker_frame = ttk.Frame(body)
-        picker_frame.pack(side="left", fill="y", padx=(0, 5))
+        body.add(picker_frame, weight=1)
 
         ttk.Label(picker_frame, text="Cliquer pour ajouter :").pack(anchor="w")
         self.gen_search = ttk.Entry(picker_frame, width=20)
@@ -216,11 +216,12 @@ class App(tk.Tk):
         self.picker_list.pack(side="left", fill="both", expand=True)
         picker_scroll.pack(side="right", fill="y")
         self.picker_list.bind("<Double-1>", self.on_picker_click)
+        self.picker_list.bind("<Return>", self.on_picker_click)
         self.refresh_picker()
 
-        # Right: preview
+        # Right: preview (75%)
         self.preview = tk.Text(body, wrap="word", state="disabled", height=20)
-        self.preview.pack(side="left", fill="both", expand=True)
+        body.add(self.preview, weight=3)
 
         self.bind("<Control-c>", lambda e: self.copy_output())
 
