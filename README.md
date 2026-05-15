@@ -3,9 +3,7 @@
 ## Prérequis
 
 - Python 3.x → https://www.python.org/downloads/ (cocher "Add to PATH")
-- `pip install pyperclip`
-
-Ou lancer `installer.bat`.
+- `pip install pyperclip` Ou lancer `installer.bat`.
 
 ## Notice utilisateur
 
