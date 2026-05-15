@@ -1,48 +1,49 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 import pyperclip
 from datetime import datetime
 import os, sys
 
-# Resolve path relative to script location
 SCRIPT_DIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 DICT_PATH = os.path.join(SCRIPT_DIR, "dictionary.py")
 
-def load_phrases():
-    """Load PHRASES dict from dictionary.py"""
+def load_data():
     ns = {}
     with open(DICT_PATH, "r", encoding="utf-8") as f:
         exec(f.read(), ns)
-    return ns.get("PHRASES", {})
+    return ns.get("PHRASES", {}), ns.get("GROUPS", {})
 
-def resolve_code(phrases, code):
-    """Resolve a code: if it's a group (list), expand recursively. Otherwise return the phrase."""
-    val = phrases.get(code)
-    if val is None:
-        return [f"[Code inconnu: {code}]"]
-    if isinstance(val, list):
-        lines = []
-        for sub in val:
-            lines.extend(resolve_code(phrases, sub.strip().upper()))
-        return lines
-    return [val]
-
-def save_phrases(phrases):
-    """Write PHRASES dict back to dictionary.py"""
+def save_data(phrases, groups):
     with open(DICT_PATH, "w", encoding="utf-8") as f:
+        f.write("# Dictionnaire de phrases pour comptes rendus de médecine légale\n\n")
         f.write("PHRASES = {\n")
         for code, phrase in phrases.items():
             escaped = phrase.replace("\\", "\\\\").replace('"', '\\"')
             f.write(f'    "{code}": "{escaped}",\n')
+        f.write("}\n\n")
+        f.write("# --- GROUPES (PARAGRAPHES) ---\n")
+        f.write("GROUPS = {\n")
+        for code, codes_list in groups.items():
+            f.write(f'    "{code}": {codes_list},\n')
         f.write("}\n")
+
+def resolve_code(phrases, groups, code):
+    if code in groups:
+        lines = []
+        for sub in groups[code]:
+            lines.extend(resolve_code(phrases, groups, sub.strip().upper()))
+        return lines
+    if code in phrases:
+        return [phrases[code]]
+    return [f"[Code inconnu: {code}]"]
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("WriteHelper - M\u00e9decine L\u00e9gale")
+        self.title("WriteHelper - Médecine Légale")
         self.geometry("900x600")
         self.configure(bg="#f0f4f8")
-        self.phrases = load_phrases()
+        self.phrases, self.groups = load_data()
 
         style = ttk.Style(self)
         style.theme_use("clam")
@@ -60,21 +61,24 @@ class App(tk.Tk):
 
         self.tab_view = ttk.Frame(notebook)
         self.tab_edit = ttk.Frame(notebook)
+        self.tab_groups = ttk.Frame(notebook)
         self.tab_gen = ttk.Frame(notebook)
 
         notebook.add(self.tab_view, text="\U0001f4cb Dictionnaire")
-        notebook.add(self.tab_edit, text="\u270f\ufe0f \u00c9diteur")
-        notebook.add(self.tab_gen, text="\u26a1 G\u00e9n\u00e9rateur")
+        notebook.add(self.tab_edit, text="\u270f\ufe0f Éditeur")
+        notebook.add(self.tab_groups, text="\U0001f4c1 Groupes")
+        notebook.add(self.tab_gen, text="\u26a1 Générateur")
 
         self.build_view_tab()
         self.build_edit_tab()
+        self.build_groups_tab()
         self.build_gen_tab()
 
     # --- TAB 1: VIEW ---
     def build_view_tab(self):
         search_frame = ttk.Frame(self.tab_view)
         search_frame.pack(fill="x", padx=10, pady=5)
-        ttk.Label(search_frame, text="🔍 Rechercher :").pack(side="left")
+        ttk.Label(search_frame, text="\U0001f50d Rechercher :").pack(side="left")
         self.view_search = ttk.Entry(search_frame, width=40)
         self.view_search.pack(side="left", padx=5)
         self.view_search.bind("<KeyRelease>", lambda e: self.refresh_view())
@@ -91,7 +95,6 @@ class App(tk.Tk):
 
         scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=self.view_tree.yview)
         self.view_tree.configure(yscrollcommand=scrollbar.set)
-
         self.view_tree.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
         self.refresh_view()
@@ -100,12 +103,11 @@ class App(tk.Tk):
         self.view_tree.delete(*self.view_tree.get_children())
         query = self.view_search.get().strip().lower() if hasattr(self, 'view_search') else ""
         for code, phrase in self.phrases.items():
-            display = str(phrase)
-            if query and query not in code.lower() and query not in display.lower():
+            if query and query not in code.lower() and query not in phrase.lower():
                 continue
-            self.view_tree.insert("", "end", values=(code, display))
+            self.view_tree.insert("", "end", values=(code, phrase))
 
-    # --- TAB 2: EDIT ---
+    # --- TAB 2: EDIT PHRASES ---
     def build_edit_tab(self):
         form = ttk.Frame(self.tab_edit)
         form.pack(fill="x", padx=10, pady=10)
@@ -165,9 +167,10 @@ class App(tk.Tk):
             if not messagebox.askyesno("Confirmation", f"Le code '{code}' existe déjà.\nVoulez-vous écraser la phrase existante ?"):
                 return
         self.phrases[code] = phrase
-        save_phrases(self.phrases)
+        save_data(self.phrases, self.groups)
         self.refresh_edit()
         self.refresh_view()
+        self.refresh_picker()
 
     def delete_entry(self):
         code = self.edit_code.get().strip().upper()
@@ -177,13 +180,157 @@ class App(tk.Tk):
         if not messagebox.askyesno("Confirmation", f"Supprimer définitivement le code '{code}' ?\n\n{self.phrases[code]}"):
             return
         del self.phrases[code]
-        save_phrases(self.phrases)
+        save_data(self.phrases, self.groups)
         self.refresh_edit()
         self.refresh_view()
+        self.refresh_picker()
         self.edit_code.delete(0, "end")
         self.edit_phrase.delete(0, "end")
 
-    # --- TAB 3: GENERATOR ---
+    # --- TAB 3: EDIT GROUPS ---
+    def build_groups_tab(self):
+        top = ttk.Frame(self.tab_groups)
+        top.pack(fill="x", padx=10, pady=10)
+
+        ttk.Label(top, text="Nom du groupe:").pack(side="left")
+        self.grp_name = ttk.Entry(top, width=15)
+        self.grp_name.pack(side="left", padx=5)
+
+        ttk.Button(top, text="Sauvegarder", command=self.save_group).pack(side="left", padx=5)
+        ttk.Button(top, text="Supprimer", command=self.delete_group).pack(side="left", padx=5)
+
+        body = ttk.Frame(self.tab_groups)
+        body.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+
+        # Left: list of existing groups
+        left = ttk.Frame(body)
+        left.pack(side="left", fill="y", padx=(0, 5))
+        ttk.Label(left, text="Groupes existants :").pack(anchor="w")
+        self.grp_listbox = tk.Listbox(left, width=25, font=("Segoe UI", 9))
+        self.grp_listbox.pack(fill="both", expand=True)
+        self.grp_listbox.bind("<<ListboxSelect>>", self.on_group_select)
+
+        # Center: available phrases to add
+        center = ttk.Frame(body)
+        center.pack(side="left", fill="both", expand=True, padx=5)
+        ttk.Label(center, text="Phrases disponibles :").pack(anchor="w")
+        self.grp_available_search = ttk.Entry(center, width=30)
+        self.grp_available_search.pack(fill="x", pady=2)
+        self.grp_available_search.bind("<KeyRelease>", lambda e: self.refresh_grp_available())
+        self.grp_available = tk.Listbox(center, font=("Segoe UI", 9))
+        self.grp_available.pack(fill="both", expand=True)
+        self.grp_available.bind("<Double-1>", self.grp_add_code)
+        self.grp_available.bind("<Return>", self.grp_add_code)
+
+        # Arrows
+        arrows = ttk.Frame(body)
+        arrows.pack(side="left", fill="y", padx=5)
+        ttk.Button(arrows, text="→", command=self.grp_add_code, width=3).pack(pady=5)
+        ttk.Button(arrows, text="←", command=self.grp_remove_code, width=3).pack(pady=5)
+        ttk.Button(arrows, text="↑", command=self.grp_move_up, width=3).pack(pady=5)
+        ttk.Button(arrows, text="↓", command=self.grp_move_down, width=3).pack(pady=5)
+
+        # Right: codes in current group (ordered)
+        right = ttk.Frame(body)
+        right.pack(side="left", fill="both", expand=True, padx=(5, 0))
+        ttk.Label(right, text="Codes du groupe (ordonnés) :").pack(anchor="w")
+        self.grp_content = tk.Listbox(right, font=("Segoe UI", 9))
+        self.grp_content.pack(fill="both", expand=True)
+
+        self.refresh_grp_list()
+        self.refresh_grp_available()
+
+    def refresh_grp_list(self):
+        self.grp_listbox.delete(0, "end")
+        for code, codes_list in self.groups.items():
+            self.grp_listbox.insert("end", f"{code} ({len(codes_list)} codes)")
+
+    def refresh_grp_available(self):
+        self.grp_available.delete(0, "end")
+        query = self.grp_available_search.get().strip().lower()
+        for code, phrase in self.phrases.items():
+            display = f"{code} - {phrase}"
+            if query and query not in display.lower():
+                continue
+            self.grp_available.insert("end", display)
+
+    def on_group_select(self, event):
+        sel = self.grp_listbox.curselection()
+        if not sel:
+            return
+        text = self.grp_listbox.get(sel[0])
+        grp_code = text.split(" (")[0]
+        self.grp_name.delete(0, "end")
+        self.grp_name.insert(0, grp_code)
+        self.grp_content.delete(0, "end")
+        for code in self.groups.get(grp_code, []):
+            phrase = self.phrases.get(code, "???")
+            self.grp_content.insert("end", f"{code} - {phrase}")
+
+    def grp_add_code(self, event=None):
+        sel = self.grp_available.curselection()
+        if not sel:
+            return
+        text = self.grp_available.get(sel[0])
+        self.grp_content.insert("end", text)
+
+    def grp_remove_code(self):
+        sel = self.grp_content.curselection()
+        if sel:
+            self.grp_content.delete(sel[0])
+
+    def grp_move_up(self):
+        sel = self.grp_content.curselection()
+        if not sel or sel[0] == 0:
+            return
+        idx = sel[0]
+        text = self.grp_content.get(idx)
+        self.grp_content.delete(idx)
+        self.grp_content.insert(idx - 1, text)
+        self.grp_content.selection_set(idx - 1)
+
+    def grp_move_down(self):
+        sel = self.grp_content.curselection()
+        if not sel or sel[0] == self.grp_content.size() - 1:
+            return
+        idx = sel[0]
+        text = self.grp_content.get(idx)
+        self.grp_content.delete(idx)
+        self.grp_content.insert(idx + 1, text)
+        self.grp_content.selection_set(idx + 1)
+
+    def save_group(self):
+        name = self.grp_name.get().strip().upper()
+        if not name:
+            messagebox.showwarning("Erreur", "Le nom du groupe ne peut pas être vide.")
+            return
+        codes = [self.grp_content.get(i).split(" - ")[0].strip() for i in range(self.grp_content.size())]
+        if not codes:
+            messagebox.showwarning("Erreur", "Le groupe doit contenir au moins un code.")
+            return
+        if name in self.groups:
+            if not messagebox.askyesno("Confirmation", f"Le groupe '{name}' existe déjà.\nVoulez-vous l'écraser ?"):
+                return
+        self.groups[name] = codes
+        save_data(self.phrases, self.groups)
+        self.refresh_grp_list()
+        self.refresh_picker()
+
+    def delete_group(self):
+        name = self.grp_name.get().strip().upper()
+        if name not in self.groups:
+            messagebox.showwarning("Erreur", f"Le groupe '{name}' n'existe pas.")
+            return
+        if not messagebox.askyesno("Confirmation", f"Supprimer définitivement le groupe '{name}' ?"):
+            return
+        del self.groups[name]
+        save_data(self.phrases, self.groups)
+        self.refresh_grp_list()
+        self.refresh_picker()
+        self.grp_name.delete(0, "end")
+        self.grp_content.delete(0, "end")
+
+    # --- TAB 4: GENERATOR ---
     def build_gen_tab(self):
         top = ttk.Frame(self.tab_gen)
         top.pack(fill="x", padx=10, pady=10)
@@ -197,11 +344,10 @@ class App(tk.Tk):
         ttk.Button(top, text="Sauvegarder", command=self.save_output).pack(side="left", padx=5)
         ttk.Button(top, text="Effacer", command=self.clear_gen).pack(side="left", padx=5)
 
-        # Code picker + preview side by side
         body = ttk.PanedWindow(self.tab_gen, orient="horizontal")
         body.pack(fill="both", expand=True, padx=10, pady=(0, 10))
 
-        # Left: code list to click (25%)
+        # Left: code picker (25%)
         picker_frame = ttk.Frame(body)
         body.add(picker_frame, weight=1)
 
@@ -227,22 +373,18 @@ class App(tk.Tk):
 
     def refresh_picker(self):
         self.picker_list.delete(0, "end")
-        query = self.gen_search.get().strip().lower()
+        query = self.gen_search.get().strip().lower() if hasattr(self, 'gen_search') else ""
         # Groups first
         self.picker_list.insert("end", "── GROUPES ──")
-        for code, val in self.phrases.items():
-            if not isinstance(val, list):
-                continue
-            display = f"{code} - {', '.join(val)}"
+        for code, codes_list in self.groups.items():
+            display = f"{code} - {', '.join(codes_list)}"
             if query and query not in display.lower():
                 continue
             self.picker_list.insert("end", display)
-        # Then individual phrases
+        # Then phrases
         self.picker_list.insert("end", "── PHRASES ──")
-        for code, val in self.phrases.items():
-            if not isinstance(val, str):
-                continue
-            display = f"{code} - {val}"
+        for code, phrase in self.phrases.items():
+            display = f"{code} - {phrase}"
             if query and query not in display.lower():
                 continue
             self.picker_list.insert("end", display)
@@ -269,7 +411,7 @@ class App(tk.Tk):
             code = code.strip().upper()
             if not code:
                 continue
-            for phrase in resolve_code(self.phrases, code):
+            for phrase in resolve_code(self.phrases, self.groups, code):
                 lines.append(f"• {phrase}")
         return "\n".join(lines)
 
@@ -295,7 +437,6 @@ class App(tk.Tk):
         output = self.get_output()
         if not output:
             return
-        from tkinter import filedialog
         filename = filedialog.asksaveasfilename(
             defaultextension=".txt",
             filetypes=[("Fichier texte", "*.txt")],

@@ -1,9 +1,6 @@
 # Dictionnaire de phrases pour comptes rendus de médecine légale
-# Format: "CODE": "Phrase"
-# Modifier/ajouter des entrées selon vos besoins
 
 PHRASES = {
-    # --- IDENTITÉ ET CONTEXTE ---
     "ID1": "Examen réalisé à la demande de",
     "ID2": "En présence de l'intéressé(e)",
     "ID3": "Patient(e) se présentant spontanément",
@@ -11,8 +8,6 @@ PHRASES = {
     "ID5": "Certificat établi à la demande de l'intéressé(e) et remis en main propre",
     "ID6": "Je soussigné(e), Docteur",
     "ID7": "Certifie avoir examiné ce jour",
-
-    # --- CIRCONSTANCES / FAITS DÉCLARÉS ---
     "F1": "La victime déclare avoir été agressée",
     "F2": "Coups portés avec les poings",
     "F3": "Coups portés avec les pieds",
@@ -28,8 +23,6 @@ PHRASES = {
     "F13": "Projection de produit irritant",
     "F14": "Menaces de mort déclarées",
     "F15": "Séquestration déclarée",
-
-    # --- ÉTAT GÉNÉRAL ---
     "EG1": "Patient(e) conscient(e) et orienté(e)",
     "EG2": "Patient(e) en bon état général",
     "EG3": "Patient(e) anxieux(se) et en pleurs",
@@ -40,8 +33,6 @@ PHRASES = {
     "EG8": "Glasgow à 15/15",
     "EG9": "Constantes hémodynamiques stables",
     "EG10": "Patient(e) algique à la mobilisation",
-
-    # --- EXAMEN CLINIQUE - TÊTE ET COU ---
     "TC1": "Ecchymose péri-orbitaire",
     "TC2": "Hématome du cuir chevelu",
     "TC3": "Plaie du cuir chevelu",
@@ -60,8 +51,6 @@ PHRASES = {
     "TC16": "Ecchymose rétro-auriculaire",
     "TC17": "Douleur à la palpation du rachis cervical",
     "TC18": "Contracture des muscles para-vertébraux cervicaux",
-
-    # --- EXAMEN CLINIQUE - MEMBRES SUPÉRIEURS ---
     "MS1": "Ecchymose du bras",
     "MS2": "Ecchymose de l'avant-bras",
     "MS3": "Lésions de défense des avant-bras",
@@ -72,8 +61,6 @@ PHRASES = {
     "MS8": "Douleur à la mobilisation de l'épaule",
     "MS9": "Hématome du bras",
     "MS10": "Dermabrasion du coude",
-
-    # --- EXAMEN CLINIQUE - TRONC ---
     "TR1": "Ecchymose thoracique",
     "TR2": "Douleur à la palpation costale",
     "TR3": "Douleur à l'inspiration profonde",
@@ -84,8 +71,6 @@ PHRASES = {
     "TR8": "Contracture des muscles para-vertébraux lombaires",
     "TR9": "Dermabrasion du tronc",
     "TR10": "Traces de liens aux poignets",
-
-    # --- EXAMEN CLINIQUE - MEMBRES INFÉRIEURS ---
     "MI1": "Ecchymose de la cuisse",
     "MI2": "Hématome de la jambe",
     "MI3": "Dermabrasion du genou",
@@ -94,8 +79,6 @@ PHRASES = {
     "MI6": "Douleur à la palpation de la cheville",
     "MI7": "Boiterie à la marche",
     "MI8": "Griffures des membres inférieurs",
-
-    # --- DESCRIPTION DES LÉSIONS ---
     "L1": "Ecchymose de couleur rouge violacé évoquant une lésion récente",
     "L2": "Ecchymose de couleur bleutée évoquant une lésion datant de 24 à 48 heures",
     "L3": "Ecchymose de couleur verdâtre évoquant une lésion datant de plusieurs jours",
@@ -111,8 +94,6 @@ PHRASES = {
     "L13": "Lésions multiples d'âges différents",
     "L14": "Absence de lésion traumatique visible",
     "L15": "Cicatrice ancienne",
-
-    # --- RETENTISSEMENT PSYCHOLOGIQUE ---
     "PSY1": "Syndrome de stress post-traumatique",
     "PSY2": "Troubles du sommeil déclarés",
     "PSY3": "Anxiété réactionnelle",
@@ -126,16 +107,12 @@ PHRASES = {
     "PSY11": "Retentissement sur la vie quotidienne",
     "PSY12": "Retentissement sur la vie professionnelle",
     "PSY13": "Retentissement sur la vie familiale",
-
-    # --- EXAMENS COMPLÉMENTAIRES ---
     "EC1": "Radiographie prescrite",
     "EC2": "Scanner prescrit",
     "EC3": "IRM prescrite",
     "EC4": "Bilan biologique prescrit",
     "EC5": "Pas d'examen complémentaire nécessaire",
     "EC6": "Résultats des examens complémentaires à joindre au dossier",
-
-    # --- ITT (INCAPACITÉ TOTALE DE TRAVAIL) ---
     "ITT0": "L'incapacité totale de travail est inférieure à un jour",
     "ITT1": "L'incapacité totale de travail est fixée à 1 jour",
     "ITT2": "L'incapacité totale de travail est fixée à 2 jours",
@@ -155,8 +132,6 @@ PHRASES = {
     "ITT90": "L'incapacité totale de travail est fixée à 90 jours",
     "ITTR": "Sous réserve de complications",
     "ITTC": "L'ITT pourra être réévaluée en fonction de l'évolution clinique",
-
-    # --- CONCLUSIONS ---
     "C1": "Les constatations sont compatibles avec les faits déclarés",
     "C2": "Les constatations ne permettent pas de confirmer ni d'infirmer les faits déclarés",
     "C3": "Absence de lésion traumatique récente constatée ce jour",
@@ -165,8 +140,6 @@ PHRASES = {
     "C6": "Certificat établi ce jour sur réquisition judiciaire",
     "C7": "Réserves émises quant à l'évolution des lésions",
     "C8": "Un complément d'examen est nécessaire après résultats des examens complémentaires",
-
-    # --- VIOLENCES SEXUELLES ---
     "VS1": "Examen gynécologique réalisé",
     "VS2": "Prélèvements médico-légaux effectués",
     "VS3": "Kit agression sexuelle utilisé",
@@ -176,15 +149,11 @@ PHRASES = {
     "VS7": "Sérologies prescrites à J0",
     "VS8": "Contraception d'urgence proposée",
     "VS9": "Orientation vers une structure spécialisée",
-
-    # --- ENFANTS / MINEURS ---
     "ENF1": "Examen réalisé en présence du représentant légal",
     "ENF2": "Développement staturo-pondéral normal",
     "ENF3": "Lésions d'âges différents évoquant des violences répétées",
     "ENF4": "Signalement effectué auprès du Procureur de la République",
     "ENF5": "Information préoccupante transmise",
-
-    # --- FORMULES MÉDICO-LÉGALES ---
     "ML1": "En l'état actuel de mes constatations",
     "ML2": "Sous réserve d'un avis spécialisé",
     "ML3": "Sous réserve de complications ultérieures",
@@ -192,10 +161,12 @@ PHRASES = {
     "ML5": "Certificat remis aux autorités requérantes",
     "ML6": "Fait à",
     "ML7": "Le",
+}
 
-    # --- GROUPES (PARAGRAPHES) ---
-    # Un groupe est une liste de codes qui seront déroulés successivement
-    "INTRO": ["ID6", "ID7", "EG1", "EG2"],
-    "CONCL": ["ML1", "C1", "C5"],
-    "STRANG": ["F6", "TC7", "TC8", "TC9"],
+# --- GROUPES (PARAGRAPHES) ---
+GROUPS = {
+    "INTRO": ['ID6', 'ID7', 'EG1', 'EG2'],
+    "CONCL": ['ML1', 'C1', 'C5'],
+    "STRANG": ['F6', 'TC7', 'TC8', 'TC9'],
+    "INTROJUD": ['ID6', 'ID7', 'ID3', 'EG1', 'EG2', 'ID5'],
 }
