@@ -1,11 +1,37 @@
 @echo off
-pip install pyperclip
+pip install pyperclip 2>nul
+
+echo Recherche de Python...
+for /f "delims=" %%i in ('where pythonw.exe 2^>nul') do set PYTHONW=%%i
+for /f "delims=" %%i in ('where python.exe 2^>nul') do set PYTHONDIR=%%i
+
+if "%PYTHONW%"=="" (
+    echo Python introuvable dans le PATH. Recherche manuelle...
+    for /d %%i in ("%LOCALAPPDATA%\Programs\Python\Python*") do (
+        if exist "%%i\pythonw.exe" (
+            set PYTHONW=%%i\pythonw.exe
+            set PYTHONDIR=%%i
+        )
+    )
+)
+
+if "%PYTHONW%"=="" (
+    echo ERREUR: Python est introuvable. Veuillez installer Python depuis https://www.python.org
+    pause
+    exit /b 1
+)
+
+echo Python trouve : %PYTHONDIR%
+
+echo Ajout de Python au PATH utilisateur...
+for %%i in ("%PYTHONW%") do set PYTHONDIR=%%~dpi
+set PYTHONSCRIPTS=%PYTHONDIR%Scripts
+powershell -Command "$p = [Environment]::GetEnvironmentVariable('Path','User'); if ($p -notlike '*%PYTHONDIR%*') { [Environment]::SetEnvironmentVariable('Path', $p + ';%PYTHONDIR%;%PYTHONSCRIPTS%', 'User') }"
+
+echo Installation de pyperclip...
+"%PYTHONDIR%\python.exe" -m pip install pyperclip
 
 echo Association de .pyw avec pythonw...
-for /f "delims=" %%i in ('where pythonw.exe 2^>nul') do set PYTHONW=%%i
-if "%PYTHONW%"=="" (
-    for /f "delims=" %%i in ('where python.exe') do set PYTHONW=%%i
-)
 ftype Python.NoConFile="%PYTHONW%" "%%1" %%*
 assoc .pyw=Python.NoConFile
 
